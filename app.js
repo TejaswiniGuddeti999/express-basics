@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
     res.send("Nothing much to say")
 })
 
-
+// Get all users
 app.get("/users",async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM users ORDER BY id");
@@ -36,6 +36,7 @@ app.get("/users",async (req, res) => {
     }
 });
 
+// Get user by ID
 app.get("/users/:id", async (req,res) => {
     const id = Number(req.params.id);
     try {
@@ -53,6 +54,23 @@ app.get("/users/:id", async (req,res) => {
     
 
 })
+
+// Insert new user
+app.post("/users", checkApiKey,async(req,res) => {
+    const name = req.body.name;
+    const age = req.body.age;
+    if (!name){
+      return res.status(400).send("Please enter your name")
+    }
+    try {
+        const result = await pool.query("INSERT INTO users (name, age) VALUES ($1, $2) RETURNING *",[name,age])
+        res.status(201).json({data: result.rows[0], message:"User added successfully"})
+    } catch(err) {
+        res.status(500).send("Database error: "+ err.message)
+    }
+
+})
+
 
 app.post("/users",checkApiKey, (req, res) => {
     const newUser = req.body;
