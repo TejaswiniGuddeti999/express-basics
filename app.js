@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express()
 app.use(express.json());
+const pool = require("./db")
 // const jwt = require("jsonwebtoken")
 
 
@@ -19,12 +20,6 @@ const checkApiKey = (req, res, next) => {
   }
 };
 
-const users = [
-    {id:4326, name: "Vyshnavi", age: 24},
-    {id:2326, name: "HemaLatha", age: 24},
-    {id:2327, name: "Tejaswini", age:23}
-]
-
 
 
 app.get("/", (req, res) => {
@@ -32,8 +27,31 @@ app.get("/", (req, res) => {
 })
 
 
-app.get("/users", (req, res) => {
-    res.json(users)
+app.get("/users",async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM users ORDER BY id");
+        res.json(result.rows);
+    }catch(err) {
+        res.status(500).send("Database error: " + err.message);
+    }
+});
+
+app.get("/users/:id", async (req,res) => {
+    const id = Number(req.params.id);
+    try {
+        const result = await pool.query("SELECT * FROM users WHERE id = $1", [id])
+        if (result.rows.length ===0 ){
+            res.status(404).send("User doesnt exist")
+        }
+        else{
+            res.json(result.rows[0]);
+        }
+    } catch(err) {
+        res.status(500).send("Database error: "+ err.message)
+
+    }
+    
+
 })
 
 app.post("/users",checkApiKey, (req, res) => {
