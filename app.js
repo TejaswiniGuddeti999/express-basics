@@ -57,8 +57,8 @@ app.get("/users/:id", async (req,res) => {
 // Insert new user
 app.post("/users", checkApiKey,async(req,res) => {
     const body = req.body || {};
-    const name = req.body.name;
-    const age = req.body.age;
+    const name = body.name;
+    const age = body.age;
     if (!name){
       return res.status(400).send("Please enter your name")
     }
@@ -75,8 +75,8 @@ app.post("/users", checkApiKey,async(req,res) => {
 app.patch("/users/:id", checkApiKey, async (req,res) => {
     const body = req.body || {};
     const id = Number(req.params.id);
-    const name = req.body.name;
-    const age = req.body.age;
+    const name = body.name;
+    const age = body.age;
     try {
         const result = await pool.query("UPDATE users SET name = COALESCE($1,name) ,age = COALESCE($2,age) WHERE id = $3 RETURNING *",[name, age, id]);
         if (result.rows.length ===0) {
