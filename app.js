@@ -56,6 +56,7 @@ app.get("/users/:id", async (req,res) => {
 
 // Insert new user
 app.post("/users", checkApiKey,async(req,res) => {
+    const body = req.body || {};
     const name = req.body.name;
     const age = req.body.age;
     if (!name){
@@ -72,6 +73,7 @@ app.post("/users", checkApiKey,async(req,res) => {
 
 // update a user
 app.patch("/users/:id", checkApiKey, async (req,res) => {
+    const body = req.body || {};
     const id = Number(req.params.id);
     const name = req.body.name;
     const age = req.body.age;
